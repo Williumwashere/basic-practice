@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env) {
-    return await handleRequest(request).catch(
+    return await handleRequest(request,env).catch(
       (err) => new Response(err.stack, { status: 500 })
     );
   },
@@ -12,21 +12,31 @@ export default {
  * @param {Request} request
  * @returns {Promise<Response>}
  */
-async function handleRequest(request) {
+async function handleRequest(request,env) {
   const method = request.method;
 
   if (method === "GET") {
-    const response = new Response();
+    try {
+      const commentsList = (await env.GoOut.get("comments")) || "[]";
+      const response = new Response(commentsList, { status: 200 });
+      return response;
+    } catch (e) {
+      console.log(e);
+      const response = new Response("Unable to retrieve data.", {
+        status: 400,
+      });
+      return response;
+    }
   }
 
   if (method === "POST") {
     try {
       const testData = await request.json();
-      const commentsList = await test.get("comments");
+      const commentsList = (await env.GoOut.get("comments")) || "[]";
       const commentsParsed = JSON.parse(commentsList);
       const updateArray = [testData, ...commentsParsed];
       const properArray = JSON.stringify(updateArray);
-      await test.put("comments", properArray);
+      await env.GoOut.put("comments", properArray);
       const response = new Response(updateArray, { status: 200 });
       return response;
     } catch {
@@ -36,3 +46,4 @@ async function handleRequest(request) {
   }
   return fetch("https://welcome.developers.workers.dev");
 }
+
