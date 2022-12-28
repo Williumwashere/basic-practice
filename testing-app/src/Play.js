@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env) {
-    return await handleRequest(request,env).catch(
+    return await handleRequest(request, env).catch(
       (err) => new Response(err.stack, { status: 500 })
     );
   },
@@ -12,7 +12,7 @@ export default {
  * @param {Request} request
  * @returns {Promise<Response>}
  */
-async function handleRequest(request,env) {
+async function handleRequest(request, env) {
   const method = request.method;
 
   if (method === "GET") {
@@ -46,4 +46,3 @@ async function handleRequest(request,env) {
   }
   return fetch("https://welcome.developers.workers.dev");
 }
-
